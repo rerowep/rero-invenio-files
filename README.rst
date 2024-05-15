@@ -31,8 +31,3 @@
         :target: https://github.com/rero/rero-invenio-files/blob/master/LICENSE
 
 Files support for the RERO invenio instances.
-
-TODO: Please provide feature overview of module
-
-Further documentation is available on
-https://rero-invenio-files.readthedocs.io/

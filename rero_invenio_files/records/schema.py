@@ -18,7 +18,7 @@
 """Files support for the RERO invenio instances."""
 
 from invenio_records_resources.services.records.schema import BaseRecordSchema
-from marshmallow import INCLUDE, Schema, fields
+from marshmallow import Schema, fields
 from marshmallow_utils.fields import SanitizedUnicode
 
 

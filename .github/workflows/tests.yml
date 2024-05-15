@@ -19,11 +19,13 @@ name: CI
 
 on:
   push:
-    branches: main
+    branches:
+      - main
+      - staging
   pull_request:
     branches:
       - main
-      - "maint-**"
+      - "staging"
   schedule:
     # * is a special character in YAML so you have to quote this string
     - cron: "0 3 * * 6"
@@ -36,7 +38,7 @@ on:
 
 jobs:
   Tests:
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     strategy:
       matrix:
         # TODO: You can add/remove combinations e.g. `dev` requirements or
@@ -44,21 +46,13 @@ jobs:
         # You can see the complete list of services and versions that are available at:
         # https://docker-services-cli.readthedocs.io/en/latest/configuration.html
         python-version: ["3.9"]
-        requirements-level: [pypi]
         db-service: [postgresql13]
         search-service: [elasticsearch]
-        include:
-          - search-service: elasticsearch
-            SEARCH_EXTRAS: "elasticsearch"
-
-          # - search-service: opensearch2
-          #   SEARCH_EXTRAS: "opensearch2"
+        dependencies: ['dev', 'deploy']
 
     env:
       DB: ${{ matrix.db-service }}
       SEARCH: ${{ matrix.search-service }}
-      # TODO: Adapt EXTRAS accordingly
-      EXTRAS: tests,${{ matrix.search-service }}
 
     steps:
       - name: Checkout
@@ -69,25 +63,20 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Generate dependencies
-        run: |
-          python -m pip install --upgrade pip setuptools py wheel requirements-builder
-          requirements-builder -e "$EXTRAS" --level=${{ matrix.requirements-level }} setup.py > .${{ matrix.requirements-level }}-${{ matrix.python-version }}-requirements.txt
+      - name: Install Poetry
+        uses: snok/install-poetry@v1
 
-      - name: Cache pip
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('.${{ matrix.requirements-level }}-${{ matrix.python-version }}-requirements.txt') }}
+      - name: Update depencencies
+        if: ${{ matrix.dependencies == 'dev' }}
+        run: poetry update
 
       - name: Install dependencies
         run: |
-          pip install -r .${{matrix.requirements-level}}-${{ matrix.python-version }}-requirements.txt
-          pip install ".[$EXTRAS]"
-          pip freeze
-          docker --version
-          docker-compose --version
+          poetry install
 
       - name: Run tests
         run: |
-          ./run-tests.sh
+          poetry run ./run-tests.sh
+
+      - name: Run build
+        run: poetry build

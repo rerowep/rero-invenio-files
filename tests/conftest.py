@@ -25,20 +25,24 @@ import pytest
 from invenio_app.factory import create_app as _create_app
 from mock_module.services import MockFileServiceConfig, MockRecordServiceConfig
 
+from rero_invenio_files.pdf import PDFGenerator
+
 
 @pytest.fixture(scope="module")
-def pdf_file():
-    """."""
-    from rero_invenio_files.pdf import PDFGenerator
-
-    data = dict(
+def simple_data():
+    """Simple document data for pdf generation."""
+    yield dict(
         header="Document pid: 1234",
         title="Simple Title",
         authors=["Author1, Author2"],
         summary="""The year 1866 was marked by a bizarre development, an unexplained and downright inexplicable phenomenon that surely no one has forgotten. Without getting into those rumors that upset civilians in the seaports and deranged the public mind even far inland, it must be said that professional seamen were especially alarmed. Traders, shipowners, captains of vessels, skippers, and master mariners from Europe and America, naval officers from every country, and at their heels the various national governments on these two continents, were all extremely disturbed by the business.""",
     )
 
-    pdf = PDFGenerator(data)
+
+@pytest.fixture(scope="module")
+def pdf_file(simple_data):
+    """Simple pdf file."""
+    pdf = PDFGenerator(simple_data)
     pdf.render()
     return pdf.output()
 

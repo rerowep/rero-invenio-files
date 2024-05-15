@@ -35,6 +35,15 @@ trap cleanup EXIT
 # python -m check_manifest
 python -m sphinx.cmd.build -qnNW docs docs/_build/html
 
+safety_exceptions="-i 51668 -i 42194 -i 62019 -i 67599 -i 51457"
+msg=$(safety check -o text ${safety_exceptions}) || {
+    echo "Safety vulnerabilites found for packages:" $(safety check -o bare ${safety_exceptions})
+    echo "Run: \"safety check -o screen ${safety_exceptions} | grep -i vulnerability\" for more details"
+    exit 1
+  }
+
+autoflake -r --remove-all-unused-imports --ignore-init-module-imports --quiet .
+
 # TODO: Remove services below that are not neeed (fix also the usage note).
 eval "$(docker-services-cli up --db ${DB:-postgresql} --search ${SEARCH:-elasticsearch} --cache ${CACHE:-redis} --mq ${MQ:-rabbitmq} --env)"
 python -m pytest

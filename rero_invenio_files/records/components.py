@@ -17,6 +17,7 @@
 
 """Thumbnail generation and full text extraction component."""
 
+import contextlib
 import os
 from io import BytesIO
 
@@ -115,55 +116,57 @@ class ThumbnailAndFulltextComponent(FileServiceComponent):
         sf = self.service
         recid = record.pid.pid_value
         # thumbnail
-        try:
-            blob = self.create_thumbnail_from_file(rfile.uri, rfile.mimetype)
-        except Exception:
-            blob = None
-        if blob:
-            thumb_name = self.change_filename_extension(file_key, "jpg")
-            sf.init_files(
-                identity=identity,
-                id_=recid,
-                data=[
-                    {"key": thumb_name, "type": "thumbnail", "thumbnail_for": file_key}
-                ],
-                uow=self.uow,
-            )
-            sf.set_file_content(
-                identity,
-                id_=recid,
-                file_key=thumb_name,
-                stream=BytesIO(blob),
-                uow=self.uow,
-            )
-            sf.commit_file(
-                identity=identity, id_=recid, file_key=thumb_name, uow=self.uow
-            )
+        with contextlib.suppress(Exception):
+            if blob := self.create_thumbnail_from_file(rfile.uri, rfile.mimetype):
+                thumb_name = self.change_filename_extension(file_key, "jpg")
+                sf.init_files(
+                    identity=identity,
+                    id_=recid,
+                    data=[
+                        {
+                            "key": thumb_name,
+                            "type": "thumbnail",
+                            "thumbnail_for": file_key,
+                        }
+                    ],
+                    uow=self.uow,
+                )
+                sf.set_file_content(
+                    identity,
+                    id_=recid,
+                    file_key=thumb_name,
+                    stream=BytesIO(blob),
+                    uow=self.uow,
+                )
+                sf.commit_file(
+                    identity=identity, id_=recid, file_key=thumb_name, uow=self.uow
+                )
         # fulltext
-        try:
-            fulltext = self.create_fulltext_from_file(rfile.uri, rfile.mimetype)
-        except Exception:
-            fulltext = None
-        if fulltext:
-            thumb_name = self.change_filename_extension(file_key, "txt")
-            sf.init_files(
-                identity=identity,
-                id_=recid,
-                data=[
-                    {"key": thumb_name, "type": "fulltext", "fulltext_for": file_key}
-                ],
-                uow=self.uow,
-            )
-            sf.set_file_content(
-                identity=identity,
-                id_=recid,
-                file_key=thumb_name,
-                stream=BytesIO(fulltext.encode()),
-                uow=self.uow,
-            )
-            sf.commit_file(
-                identity=identity, id_=recid, file_key=thumb_name, uow=self.uow
-            )
+        with contextlib.suppress(Exception):
+            if fulltext := self.create_fulltext_from_file(rfile.uri, rfile.mimetype):
+                thumb_name = self.change_filename_extension(file_key, "txt")
+                sf.init_files(
+                    identity=identity,
+                    id_=recid,
+                    data=[
+                        {
+                            "key": thumb_name,
+                            "type": "fulltext",
+                            "fulltext_for": file_key,
+                        }
+                    ],
+                    uow=self.uow,
+                )
+                sf.set_file_content(
+                    identity=identity,
+                    id_=recid,
+                    file_key=thumb_name,
+                    stream=BytesIO(fulltext.encode()),
+                    uow=self.uow,
+                )
+                sf.commit_file(
+                    identity=identity, id_=recid, file_key=thumb_name, uow=self.uow
+                )
 
     def delete_file(self, identity, id_, file_key, record, deleted_file):
         """Delete file handler.
@@ -180,16 +183,12 @@ class ThumbnailAndFulltextComponent(FileServiceComponent):
         sf = self.service
         recid = record.pid.pid_value
         thumb_name = self.change_filename_extension(file_key, "jpg")
-        try:
+        with contextlib.suppress(FileKeyNotFoundError):
             sf.delete_file(
                 identity=identity, id_=recid, file_key=thumb_name, uow=self.uow
             )
-        except FileKeyNotFoundError:
-            pass
         fulltext_name = self.change_filename_extension(file_key, "txt")
-        try:
+        with contextlib.suppress(FileKeyNotFoundError):
             sf.delete_file(
                 identity=identity, id_=recid, file_key=fulltext_name, uow=self.uow
             )
-        except FileKeyNotFoundError:
-            pass

@@ -82,13 +82,7 @@ def preview(pid, record, template=None, **kwargs):
                 return plugin.preview(fileobj)
             except Exception:
                 current_app.logger.warning(
-                    (
-                        "Preview failed for {key}, in {pid_type}:{pid_value}".format(
-                            key=fileobj.file.key,
-                            pid_type=fileobj.pid.pid_type,
-                            pid_value=fileobj.pid.pid_value,
-                        )
-                    ),
+                    f"Preview failed for {fileobj.file.key}, in {fileobj.pid.pid_type}:{fileobj.pid.pid_value}",
                     exc_info=True,
                 )
     return default.preview(fileobj)

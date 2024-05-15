@@ -20,15 +20,8 @@
 from rero_invenio_files.pdf import PDFGenerator
 
 
-def test_pdf_generation():
-    # Instantiation of inherited class
-    data = dict(
-        header="Document pid: 1234",
-        title="Simple Title",
-        authors=["Author1, Author2"],
-        summary="""The year 1866 was marked by a bizarre development, an unexplained and downright inexplicable phenomenon that surely no one has forgotten. Without getting into those rumors that upset civilians in the seaports and deranged the public mind even far inland, it must be said that professional seamen were especially alarmed. Traders, shipowners, captains of vessels, skippers, and master mariners from Europe and America, naval officers from every country, and at their heels the various national governments on these two continents, were all extremely disturbed by the business.""",
-    )
-
-    pdf = PDFGenerator(data)
+def test_pdf_generation(simple_data):
+    """Test the pdf generation."""
+    pdf = PDFGenerator(simple_data)
     pdf.render()
     assert pdf.output()

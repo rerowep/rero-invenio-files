@@ -45,9 +45,7 @@ class PreviewFileLink(FileLink):
         # pdf is supported
         if not hasattr(obj.file, "mimetype"):
             return False
-        if obj.file.mimetype in ["application/pdf", "image/jpeg", "image/png"]:
-            return True
-        return False
+        return obj.file.mimetype in ["application/pdf", "image/jpeg", "image/png"]
 
 
 class ThumbFileLink(PreviewFileLink):
