@@ -7,24 +7,24 @@ license = "GNU Affero General Public License v3.0"
 readme = "README.rst"
 
 [tool.poetry.dependencies]
-python = "^3.9"
-invenio-records-resources = "<5.7.0"
-invenio-search = {version = ">=2.1.0,<3.0.0", extras = ["elasticsearch7"]}
-invenio-db = {version = ">=1.1.0,<1.2.0", extras = ["postgresql"]}
-fpdf2 = "^2.7.7"
-pymupdf = "^1.23.21"
-invenio-previewer = "^2.2.0"
-invenio-theme = "<4.0.0"
+python = ">=3.8,<3.10"
+invenio-records-resources = "<8.0.0"
+invenio-search = {version = ">=2.1.0,<4.0.0", extras = ["elasticsearch7"]}
+invenio-db = {version = ">=1.1.0,<3.0.0", extras = ["postgresql"]}
+fpdf2 = "<3.0.0"
+pymupdf = "<2.0.0"
+invenio-previewer = "<4.0.0"
+invenio-theme = "<5.0.0"
 
 
 [tool.poetry.group.dev.dependencies]
-invenio-app = ">=1.3.4,<1.4.0"
-pytest-invenio = ">=2.1.6,<3.0.0"
+invenio-app = ">=1.3.4,<3.0.0"
+pytest-invenio = ">=2.1.6,<4.0.0"
 pytest-black = ">=0.3.0"
 sphinx = ">=4.5.0"
-mock = "^5.1.0"
-safety = "^3.2.0"
-autoflake = "^2.3.1"
+mock = ">=5.1.0,<6.0.0"
+safety = "<4.0.0"
+autoflake = "<3.0.0"
 
 [build-system]
 requires = ["poetry-core"]
